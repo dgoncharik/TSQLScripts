@@ -56,7 +56,7 @@ BEGIN
 			
 			IF @DELETE = 1
 				BEGIN
-					print 'Удаление строк старше ' + @strDate;
+					print 'Удаление строк старше ' + @strDate + ' из таблицы ' +  @tableName;
 					SET @text = 'DELETE FROM ' + @tableName + ' WHERE ' + @SELECTION;
 		  		END;
 			 ELSE
