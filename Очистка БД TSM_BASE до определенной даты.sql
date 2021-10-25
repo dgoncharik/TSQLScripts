@@ -1,19 +1,19 @@
-USE [TSM_BASE_not_small]
+USE [TSM_BASE]
 
 DECLARE @date DATE;
 DECLARE @strDate VARCHAR(10);
-DECLARE @tableName VARCHAR(400); -- имя таблицы
+DECLARE @tableName VARCHAR(400); -- ГЁГ¬Гї ГІГ ГЎГ«ГЁГ¶Г»
 DECLARE @DELETE BIT;
 
 BEGIN TRY
---------------------------ПАРАМЕТРЫ-----------------------------------
+--------------------------ГЏГЂГђГЂГЊГ…Г’ГђГ›-----------------------------------
 ----------------------------------------------------------------------
-	SET @date = '2020-01-01'; --ГГГГ-ММ-ЧЧ. Число, меньше которого нужно удалить все строки из таблиц 'HISTORY_*'
-	SET @DELETE = 1 -- 0-не удалять строки, только показать какие будут удалены, 1-удалить строки из таблиц.
+	SET @date = '2020-01-01'; --ГѓГѓГѓГѓ-ГЊГЊ-Г—Г—. Г—ГЁГ±Г«Г®, Г¬ГҐГ­ГјГёГҐ ГЄГ®ГІГ®Г°Г®ГЈГ® Г­ГіГ¦Г­Г® ГіГ¤Г Г«ГЁГІГј ГўГ±ГҐ Г±ГІГ°Г®ГЄГЁ ГЁГ§ ГІГ ГЎГ«ГЁГ¶ 'HISTORY_*'
+	SET @DELETE = 1 -- 0-Г­ГҐ ГіГ¤Г Г«ГїГІГј Г±ГІГ°Г®ГЄГЁ, ГІГ®Г«ГјГЄГ® ГЇГ®ГЄГ Г§Г ГІГј ГЄГ ГЄГЁГҐ ГЎГіГ¤ГіГІ ГіГ¤Г Г«ГҐГ­Г», 1-ГіГ¤Г Г«ГЁГІГј Г±ГІГ°Г®ГЄГЁ ГЁГ§ ГІГ ГЎГ«ГЁГ¶.
 ----------------------------------------------------------------------
 
 	SET @strDate = CONVERT(varchar, @date);
-	print 'Введена дата: ' + @strDate;
+	print 'Г‚ГўГҐГ¤ГҐГ­Г  Г¤Г ГІГ : ' + @strDate;
 	
 END TRY
 BEGIN CATCH
@@ -34,11 +34,11 @@ BEGIN CATCH
 END CATCH
 
 
--- Объявляем курсор
+-- ГЋГЎГєГїГўГ«ГїГҐГ¬ ГЄГіГ°Г±Г®Г°
 DECLARE t_cursor CURSOR FOR 
 	SELECT name FROM sys.tables WHERE name like 'HISTORY_%' ORDER BY name
 	
--- Открываем курсор
+-- ГЋГІГЄГ°Г»ГўГ ГҐГ¬ ГЄГіГ°Г±Г®Г°
 OPEN t_cursor
 
 FETCH NEXT FROM t_cursor INTO @tableName 
@@ -56,16 +56,16 @@ BEGIN
 			
 			IF @DELETE = 1
 				BEGIN
-					print 'Удаление строк старше ' + @strDate;
+					print 'Г“Г¤Г Г«ГҐГ­ГЁГҐ Г±ГІГ°Г®ГЄ Г±ГІГ Г°ГёГҐ ' + @strDate;
 					SET @text = 'DELETE FROM ' + @tableName + ' WHERE ' + @SELECTION;
 		  		END;
 			 ELSE
 				BEGIN
-					print 'Просмотр строк которые будут удалены.';
-					SET @text = 'SELECT '''+@tableName+''' AS [Имя таблицы], * FROM ' + @tableName + ' WHERE ' + @SELECTION + ' ORDER BY time';
+					print 'ГЏГ°Г®Г±Г¬Г®ГІГ° Г±ГІГ°Г®ГЄ ГЄГ®ГІГ®Г°Г»ГҐ ГЎГіГ¤ГіГІ ГіГ¤Г Г«ГҐГ­Г».';
+					SET @text = 'SELECT '''+@tableName+''' AS [Г€Г¬Гї ГІГ ГЎГ«ГЁГ¶Г»], * FROM ' + @tableName + ' WHERE ' + @SELECTION + ' ORDER BY time';
 				END;
 				
-			print 'Выполнение запроса: ';
+			print 'Г‚Г»ГЇГ®Г«Г­ГҐГ­ГЁГҐ Г§Г ГЇГ°Г®Г±Г : ';
 			print @text	
 			exec (@text)
 	
