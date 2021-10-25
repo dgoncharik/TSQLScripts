@@ -1,19 +1,19 @@
-USE [TSM_BASE]
+USE [ИМЯ_БД]
 
 DECLARE @date DATE;
 DECLARE @strDate VARCHAR(10);
-DECLARE @tableName VARCHAR(400); -- èìÿ òàáëèöû
+DECLARE @tableName VARCHAR(400);
 DECLARE @DELETE BIT;
 
 BEGIN TRY
---------------------------ÏÀÐÀÌÅÒÐÛ-----------------------------------
+--------------------------ПАРАМЕТРЫ-----------------------------------
 ----------------------------------------------------------------------
-	SET @date = '2020-01-01'; --ÃÃÃÃ-ÌÌ-××. ×èñëî, ìåíüøå êîòîðîãî íóæíî óäàëèòü âñå ñòðîêè èç òàáëèö 'HISTORY_*'
-	SET @DELETE = 1 -- 0-íå óäàëÿòü ñòðîêè, òîëüêî ïîêàçàòü êàêèå áóäóò óäàëåíû, 1-óäàëèòü ñòðîêè èç òàáëèö.
+	SET @date = '2020-01-01'; --ГГГГ-ММ-ЧЧ. Число, меньше которого нужно удалить все строки из таблиц 'HISTORY_*'
+	SET @DELETE = 0 -- 0-не удалять строки, только показать какие будут удалены, 1-удалить строки из таблиц.
 ----------------------------------------------------------------------
 
 	SET @strDate = CONVERT(varchar, @date);
-	print 'Ââåäåíà äàòà: ' + @strDate;
+	print 'Введена дата: ' + @strDate;
 	
 END TRY
 BEGIN CATCH
@@ -34,11 +34,11 @@ BEGIN CATCH
 END CATCH
 
 
--- Îáúÿâëÿåì êóðñîð
+-- Объявляем курсор
 DECLARE t_cursor CURSOR FOR 
 	SELECT name FROM sys.tables WHERE name like 'HISTORY_%' ORDER BY name
 	
--- Îòêðûâàåì êóðñîð
+-- Открываем курсор
 OPEN t_cursor
 
 FETCH NEXT FROM t_cursor INTO @tableName 
@@ -56,16 +56,16 @@ BEGIN
 			
 			IF @DELETE = 1
 				BEGIN
-					print 'Óäàëåíèå ñòðîê ñòàðøå ' + @strDate;
+					print 'Удаление строк старше ' + @strDate;
 					SET @text = 'DELETE FROM ' + @tableName + ' WHERE ' + @SELECTION;
 		  		END;
 			 ELSE
 				BEGIN
-					print 'Ïðîñìîòð ñòðîê êîòîðûå áóäóò óäàëåíû.';
-					SET @text = 'SELECT '''+@tableName+''' AS [Èìÿ òàáëèöû], * FROM ' + @tableName + ' WHERE ' + @SELECTION + ' ORDER BY time';
+					print 'Просмотр строк которые будут удалены.';
+					SET @text = 'SELECT '''+@tableName+''' AS [Имя таблицы], * FROM ' + @tableName + ' WHERE ' + @SELECTION + ' ORDER BY time';
 				END;
 				
-			print 'Âûïîëíåíèå çàïðîñà: ';
+			print 'Выполнение запроса: ';
 			print @text	
 			exec (@text)
 	
